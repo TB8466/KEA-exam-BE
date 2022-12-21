@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "kea-exam-be",
   "version": "1.0.0",
   "description": "",
@@ -9,6 +10,7 @@
   "author": "TB & Tobi",
   "license": "MIT",
   "dependencies": {
+    "@hubspot/api-client": "^8.3.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2"
   }
