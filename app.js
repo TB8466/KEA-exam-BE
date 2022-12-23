@@ -4,6 +4,7 @@ import * as dotenv from "dotenv"
 //Routers
 import getContacts from "./routers/getContactsByQuery.js";
 import getDeals from "./routers/getDealsByContactId.js"
+import createTicket from "./routers/createTicket.js"
 
 
 dotenv.config();
@@ -13,7 +14,7 @@ const PORT = process.env.PORT || 8080 || 3000
 
 app.use(cors())
 
-app.use(getContacts, getDeals);
+app.use(getContacts, getDeals, createTicket);
 
 
 app.listen(PORT, () => {
