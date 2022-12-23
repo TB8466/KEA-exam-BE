@@ -6,7 +6,7 @@ const router = Router();
 dotenv.config();
 const hubspotClient = new Client({ "accessToken": process.env.ACCESS_TOKEN });
 
-router.get("/contact/:number", async (req, res) => {
+router.get("/contacts/:number", async (req, res) => {
   const PublicObjectSearchRequest = {
     "filterGroups":[{"filters":[{"value":`*${req.params.number}`,"propertyName":"phone","operator":"CONTAINS_TOKEN"}]}], 
     "sorts" : [
