@@ -6,38 +6,45 @@ const router = Router();
 dotenv.config();
 const hubspotClient = new Client({ "accessToken": process.env.ACCESS_TOKEN });
 
-
-
-
-router.get('/ticket/:dealId', async(req, res) =>{
-
+async function createTicket(name, desc, serial){
     const SimplePublicObjectInput = {
         properties : {
             "hs_pipeline": "0",
             "hs_pipeline_stage": "1",
             "hs_ticket_priority": "MEDIUM",
-            "subject": "Test ticket"
+            "subject": `${name}`,
+            "content": `${desc}`,
+            "serial_number": `${serial}`
         }
     }
+    const createTicketResponse = await hubspotClient.crm.tickets.basicApi.create(SimplePublicObjectInput);
+    //console.log("Ticket created with id:",createTicketResponse.id);
+    return createTicketResponse;
+}
 
-    const createTicketResponse = await hubspotClient.crm.tickets.basicApi.create(SimplePublicObjectInput)
+async function associateWithDeal(ticketId, dealId){
+    const AssociationSpec = [
+        {
+          "associationCategory": "HUBSPOT_DEFINED",
+          "associationTypeId": 28
+        }
+    ];
 
-    //Associate
-    const BatchInputPublicAssociation = { 
-        "from":{"id":`${createTicketResponse.id}`},"to":{"id":`${req.params.dealId}`},"type":"ticket_to_deal"
-    };
-    console.log("BatchInput :",BatchInputPublicAssociation.from.id,BatchInputPublicAssociation.to.id);
-    console.log("Ticket id :", createTicketResponse.id,"Deal id :",req.params.dealId);
-    const fromObjectType = "tickets";
-    const toObjectType = "deals";
     try {
-        const apiResponse = await hubspotClient.crm.associations.batchApi.create(fromObjectType, toObjectType, BatchInputPublicAssociation);
-        res.send(JSON.stringify(apiResponse, null, 2));
+        const apiResponse = await hubspotClient.crm.tickets.associationsApi.create(ticketId, "deal", dealId, AssociationSpec);
+        //console.log(JSON.stringify(apiResponse, null, 2));
       } catch (e) {
         e.message === 'HTTP request failed'
           ? console.error(JSON.stringify(e.response, null, 2))
           : console.error(e)
       }
-  })
+}
+
+router.post('/ticket', async(req,res) => {
+    console.log("Incoming ticketRequest:",req.body);
+    const ticketResponse = await createTicket(req.body.name,req.body.description,req.body.serialNumber);
+    await associateWithDeal(ticketResponse.id, req.body.dealId)
+    res.send(true)
+})
 
 export default router;
