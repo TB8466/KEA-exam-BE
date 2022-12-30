@@ -15,14 +15,12 @@ router.get("/contacts/:number", async (req, res) => {
         "direction" : "DESCENDING"
       }
     ], 
-    "properties": ["firstname","lastname","phone", "email"],
+    "properties": ["firstname","lastname"],
     "limit": 10,
   };
   try {
     const apiResponse = await hubspotClient.crm.contacts.searchApi.doSearch(PublicObjectSearchRequest);
-      
     res.send(JSON.parse(JSON.stringify(apiResponse.results, null, 2)));
-    
   } catch (e) {
     e.message === 'HTTP request failed'
       ? console.error(JSON.stringify(e.response, null, 2))
